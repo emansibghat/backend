@@ -5,7 +5,7 @@ const { addBookToFavorites, removeBookFromFavorites,getFavorites } = require('..
 
 // Route to add a book to the user's favorites
 router.post('/add', addBookToFavorites);
-router.get("/",getFavorites)
+router.get("/fetch",getFavorites)
 
 // Route to remove a book from the user's favorites
 router.delete('/remove/:id', removeBookFromFavorites);
