@@ -1,7 +1,8 @@
 const User = require('../models/User');
 const Book = require('../models/Book');
 const Favorite = require('../models/Favorite');
-
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const addBookToFavorites = async (req, res) => {
 
   try {
@@ -32,20 +33,15 @@ const addBookToFavorites = async (req, res) => {
 // Remove from Favorites
 const removeBookFromFavorites = async (req, res) => {
   try {
-    const { id } = req.params; // Book ID
-    const { userId } = req.query; // User ID from query parameters
+    const { bookId,userId } = req.query; 
 
-    // Find the user by userId
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(200).json({ message: "User not found" });
+    const favoriteItem = await Favorite.findOneAndDelete({  userId: new ObjectId(userId), 
+      bookId: new ObjectId(bookId)});
+    if (!favoriteItem) {
+      return res.status(400).json({ message: "Favorite not found" });
     }
-    const updatedFavorites = user.favorites.filter(fav => fav._id.toString() !== id.toString());
-    user.favorites = updatedFavorites;
-    await user.save();
 
-    // Respond with the updated favorites
-    return res.status(200).json(updatedFavorites);
+    return res.status(200).json({ message: "Removed from favorites" });
   } catch (error) {
     console.error("Error removing from favorites:", error);
     return res.status(500).json({ message: "Error removing from favorites" });
@@ -53,18 +49,18 @@ const removeBookFromFavorites = async (req, res) => {
 };
 const getFavorites = async (req, res) => {
   try {
-    const { userId } = req.query;
-    const favoriteItems = await Favorite.find({ userId: userId });
-    if (!favoriteItems) {
-      return res.status(200).json({ message: "items not found" });
+    const { userId } = req.query; 
+    if (!userId) {
+      return res.status(400).json({ message: "UserId is required" });
     }
+    
+    const favoriteItems = await Favorite.find({ userId }).populate("bookId");
     return res.status(200).json(favoriteItems);
   } catch (error) {
     console.error("Error getting favorites:", error);
     return res.status(500).json({ message: "Error getting favorites" });
   }
-
-}
+};
 
 module.exports = {
   addBookToFavorites,

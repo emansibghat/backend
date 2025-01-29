@@ -8,6 +8,6 @@ router.post('/add', addBookToFavorites);
 router.get("/fetch",getFavorites)
 
 // Route to remove a book from the user's favorites
-router.delete('/remove/:id', removeBookFromFavorites);
+router.delete('/remove', removeBookFromFavorites);
 
 module.exports = router;
